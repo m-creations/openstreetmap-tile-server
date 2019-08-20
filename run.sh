@@ -9,11 +9,12 @@ function CreatePostgressqlConfig()
   cat /etc/postgresql/10/main/postgresql.custom.conf
 }
 
-if [ "$#" -ne 1 ]; then
-    echo "usage: <import|run>"
+if [[ $# < 1 ]]; then
+    echo "usage: { import | run | -- shell commands and arguments }"
     echo "commands:"
     echo "    import: Set up the database and import /data.osm.pbf"
     echo "    run: Runs Apache and renderd to serve tiles at /tile/{z}/{x}/{y}.png"
+    echo "    -- ...: Runs whatever follows the double-dash with bash as a shell."
     echo "environment variables:"
     echo "    THREADS: defines number of threads used for importing / tile rendering"
     echo "    UPDATES: consecutive updates (enabled/disabled)"
@@ -65,7 +66,7 @@ fi
 if [ "$1" = "run" ]; then
     # Clean /tmp
     rm -rf /tmp/*
-    
+
     # Fix postgres data privileges
     chown postgres:postgres /var/lib/postgresql -R
 
@@ -87,6 +88,13 @@ if [ "$1" = "run" ]; then
     service postgresql stop
 
     exit 0
+fi
+
+if [ "$1" = "--" ]; then
+    echo double dash
+    shift
+    bash -c "$*"
+    exit $?
 fi
 
 echo "invalid command"
