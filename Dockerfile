@@ -3,6 +3,8 @@ FROM ubuntu:18.04
 # Based on
 # https://switch2osm.org/manually-building-a-tile-server-18-04-lts/
 
+ENV PG_MAJOR_VERSION=10
+
 # Set up environment
 ENV TZ=UTC
 ENV AUTOVACUUM=on
@@ -52,10 +54,10 @@ RUN echo "deb [ allow-insecure=yes ] http://apt.postgresql.org/pub/repos/apt/ bi
   nodejs \
   npm \
   postgis \
-  postgresql-10 \
-  postgresql-10-postgis-2.5 \
-  postgresql-10-postgis-2.5-scripts \
-  postgresql-contrib-10 \
+  postgresql-$PG_MAJOR_VERSION \
+  postgresql-$PG_MAJOR_VERSION-postgis-2.5 \
+  postgresql-$PG_MAJOR_VERSION-postgis-2.5-scripts \
+  postgresql-contrib-$PG_MAJOR_VERSION \
   protobuf-c-compiler \
   python-mapnik \
   sudo \
@@ -138,10 +140,10 @@ RUN ln -sf /proc/1/fd/1 /var/log/apache2/access.log \
   && ln -sf /proc/1/fd/2 /var/log/apache2/error.log
 
 # Configure PosgtreSQL
-COPY postgresql.custom.conf.tmpl /etc/postgresql/10/main/
+COPY postgresql.custom.conf.tmpl /etc/postgresql/$PG_MAJOR_VERSION/main/
 RUN chown -R postgres:postgres /var/lib/postgresql \
-  && chown postgres:postgres /etc/postgresql/10/main/postgresql.custom.conf.tmpl \
-  && echo "\ninclude 'postgresql.custom.conf'" >> /etc/postgresql/10/main/postgresql.conf
+  && chown postgres:postgres /etc/postgresql/$PG_MAJOR_VERSION/main/postgresql.custom.conf.tmpl \
+  && echo "\ninclude 'postgresql.custom.conf'" >> /etc/postgresql/$PG_MAJOR_VERSION/main/postgresql.conf
 
 # copy update scripts
 COPY openstreetmap-tiles-update-expire /usr/bin/

@@ -4,9 +4,10 @@ set -x
 
 function CreatePostgressqlConfig()
 {
-  cp /etc/postgresql/10/main/postgresql.custom.conf.tmpl /etc/postgresql/10/main/postgresql.custom.conf
-  sudo -u postgres echo "autovacuum = $AUTOVACUUM" >> /etc/postgresql/10/main/postgresql.custom.conf
-  cat /etc/postgresql/10/main/postgresql.custom.conf
+  conf_dir=/etc/postgresql/$PG_MAJOR_VERSION/main
+  cp $conf_dir/postgresql.custom.conf.tmpl $conf_dir/postgresql.custom.conf
+  sudo -u postgres echo "autovacuum = $AUTOVACUUM" >> $conf_dir/postgresql.custom.conf
+  cat $conf_dir/postgresql.custom.conf
 }
 
 if [[ $# < 1 ]]; then
