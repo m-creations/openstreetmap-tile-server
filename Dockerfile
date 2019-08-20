@@ -9,6 +9,7 @@ ENV PG_MAJOR_VERSION=10
 ENV TZ=UTC
 ENV AUTOVACUUM=on
 ENV UPDATES=disabled
+ENV PG_LOCALE=en_US.utf8
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Install dependencies
@@ -48,6 +49,7 @@ RUN echo "deb [ allow-insecure=yes ] http://apt.postgresql.org/pub/repos/apt/ bi
   libtiff5-dev \
   libtool \
   libxml2-dev \
+  locales \
   lua5.3 \
   make \
   mapnik-utils \
@@ -143,6 +145,7 @@ RUN ln -sf /proc/1/fd/1 /var/log/apache2/access.log \
 COPY postgresql.custom.conf.tmpl /etc/postgresql/$PG_MAJOR_VERSION/main/
 RUN chown -R postgres:postgres /var/lib/postgresql \
   && chown postgres:postgres /etc/postgresql/$PG_MAJOR_VERSION/main/postgresql.custom.conf.tmpl \
+  && locale-gen $PG_LOCALE \
   && echo "\ninclude 'postgresql.custom.conf'" >> /etc/postgresql/$PG_MAJOR_VERSION/main/postgresql.conf
 
 # copy update scripts

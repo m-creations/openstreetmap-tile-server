@@ -22,7 +22,19 @@ if [[ $# < 1 ]]; then
     exit 1
 fi
 
+# check the locale and generate it, if not present
+locale -a | grep -e "^$PG_LOCALE$"
+if [[ $? != 0 ]] ; then
+    locale-gen $PG_LOCALE
+fi
+
+data_dir=/var/lib/postgresql/$PG_MAJOR_VERSION/main
+
 if [ "$1" = "import" ]; then
+    if [[ ! -f $data_dir/PG_VERSION ]] ; then
+        chown -R postgres:postgres $data_dir
+        sudo -u postgres /usr/lib/postgresql/$PG_MAJOR_VERSION/bin/initdb --encoding=UTF8 --locale $PG_LOCALE $data_dir
+    fi
     # Initialize PostgreSQL
     CreatePostgressqlConfig
     service postgresql start
